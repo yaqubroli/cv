@@ -1,0 +1,70 @@
+name: "Jacob Walchuk"
+email: "walchuk2018@icloud.com"
+www: "jacob.hcol.uk"
+
+phones:
+  - cc: "UK"
+    phone: "+44 7519 615 066"
+  - cc: "CA"
+    phone: "+1 604 880 4825"
+
+cv:
+  - title: Education
+    entries:
+      - title: "Westside School"
+        location: "Vancouver, Canada"
+        date: "2019---2021"
+        bullets:
+          - "/A\*A\*A\*A\*A-equivalent marks, per KCL's conversion scale."
+      - title: "Trinity Western University"
+        role: "B.A. in Political Studies"
+        location: "Langley, Canada"
+        date: "2021---2022"
+        bullets:
+          - "Received a 4.23/4.3 grade average in my first year, before transferring."
+      - title: "University of St. Andrews"
+        role: "M.A. Hons. in Philosophy"
+        location: "St. Andrews, Scotland"
+        date: "2022---2025"
+        bullets:
+          - "Standing 2:2 Honours, with a focus on symbolic logic and analytic metaphysics."
+  - title: Work Experience
+    entries:
+      - title: "Kova Engineering, Ltd."
+        role: "Technical Analyst Intern"
+        location: "Langley, Canada"
+        date: "Summer 2023"
+        bullets:
+          - "Discovered employee concerns around an improperly-scaled MySQL database with a ColdFusion frontend, and wrote a longform report on the costs and benefits of a full-stack overhaul to PostgreSQL and Next.js."
+          - "Consulted with the CEO, CTO, and other members of the executive team in discovering their needs."
+          - "Submitted a code proposal to the lead programmer, which secured and sped up interoperability between the old and new system."
+      - title: "Kova Engineering, Ltd."
+        role: "Assistant I.T. Technician"
+        location: "Langley, Canada"
+        date: "2018---2022"
+        bullets:
+          - "Deployed laptops and servers running Windows, and iPhones using Apple's Device Enrolment Programme."
+          - "Onboarded metallurgy technicians with little-to-no IT background."
+      - title: "Free Geek Vancouver"
+        role: "Repair Technician"
+        date: "2017---2018"
+        location: "Vancouver, Canada"
+        bullets:
+          - "Stress-tested PC components including RAM, CPUs, and GPUs, and performed light component-level board repair."
+
+projects:
+  - title: "Book Tracker"
+    bullets:
+      - "Reverse-engineered the SQLite schemas of bibliographic and note-taking software, and wrote a quick Node.js tool to generate progress reports and publish notes to my personal website."
+  - title: "Homelab"
+    bullets:
+      - "Ran a decomissioned rackmount server at home, deploying KVM on Debian, and later, Xen."
+skills:
+  - "Certifications: CompTIA Linux+, IBM Data Analyst Certificate (Excel, Cognos, and R), IBM Data Science Certificate (Python)."
+  - "Languages: Mandarin (working proficiency), German (basic)."
+  - "Proficient in VBA, HTML/CSS/JS, and Emacs LISP."
+  - "Interests: Linguistics, social and economic history, corporate finance."
+
+footer:
+  - "This {{DOCTYPE}} was generated from YAML source using {{LANG}}. For more information, see jacob.hcol.uk/cv."
+  - "Authorised to work full-time in the UK, without sponsorship, via an Ancestry Visa."

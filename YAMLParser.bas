@@ -1,14 +1,14 @@
 Attribute VB_Name = "YAMLParser"
 Option Explicit
 
-Dim yamlPath As String
+Const yamlPath As String = "\\Mac\iCloud\Development\cv\cv.yml"
 
-Dim selfIdentifier As String
-Dim typeIdentifier As String
-Dim errIdentifier As String
+Const selfIdentifier As String = "___self___"
+Const typeIdentifier As String = "___type___"
+Const errIdentifier As String = "YAML Error in " & yamlPath
 
-Dim malformedTypeError As String
-Dim malformedYAMLError As String
+Const malformedTypeError As String = "Malformed YAML code at " & yamlPath & " on line "
+Const malformedYAMLError As String = "Malformed type error - this is a problem with the internal dictionary"
 
 Function RemoveEmptyStrings(arr() As String) As String()
     Dim tempArray() As String
@@ -122,7 +122,7 @@ End Function
 ' }
 
 
-Function GetYAMLLayerAsDictionary(fromYAML As String, Optional parentType As String = "Dictionary") As Dictionary
+Function GetYAMLLayerAsDictionary(fromYAML As String) As Dictionary
     Dim mainDictionary As Dictionary: Set mainDictionary = New Dictionary
     ' create regex objects to test for dict, array, and string
     
@@ -136,9 +136,9 @@ Function GetYAMLLayerAsDictionary(fromYAML As String, Optional parentType As Str
     
     Dim parts() As String
     
-    If RegexMatch(fromYAML, "^[A-Za-z]", True) Then
+    If RegexMatch(fromYAML, "(?:\n|\^)\w+:", True) Then
         ' is a dictionary
-        parts = RegexSplit(fromYAML, "\n[A-Za-z]", False, True)
+        parts = RegexSplit(fromYAML, "\n\w+:", False, True)
         Dim part As Variant ' not sure why it can't be as string but whatever billy gates
         Call mainDictionary.Add(typeIdentifier, "Dictionary") ' identify as dict
         For Each part In parts
@@ -155,8 +155,11 @@ Function GetYAMLLayerAsDictionary(fromYAML As String, Optional parentType As Str
     ElseIf RegexMatch(fromYAML, "^-\s", True) Then
         ' is an array
         Call mainDictionary.Add(typeIdentifier, "Array")
-        parts = RegexSplit(fromYAML, "-\s", False)
-        For Each part In parts
+        parts = RegexSplit(fromYAML, "(^|\n)-\s", False)
+        Dim i As Integer
+        For i = LBound(parts) To UBound(parts)
+            parts(i) = RegexSubstitute(parts(i), "\n\s{2}", vbLf)
+        Next i
         Call mainDictionary.Add(selfIdentifier, parts)
     ElseIf RegexMatch(fromYAML, "^\s*""(.*?)""\s*$", True) Then
         ' is a string
@@ -164,11 +167,11 @@ Function GetYAMLLayerAsDictionary(fromYAML As String, Optional parentType As Str
         Call mainDictionary.Add(selfIdentifier, RegexSubstitute(fromYAML, """", ""))
     Else
         Call mainDictionary.Add(selfIdentifier, "")
-        Call MsgBox( _
+        Debug.Print _
         "Neither array, dictionary, nor string:" & _
         vbCrLf & vbCrLf & fromYAML & vbCrLf & vbCrLf & _
-        "Make sure all strings are enclosed in double quotes.", _
-        vbOKOnly, "YAML Error")
+        "Make sure all strings are enclosed in double quotes." ', _
+        'vbOKOnly, "YAML Error")
     End If
     
     Set GetYAMLLayerAsDictionary = mainDictionary
@@ -208,15 +211,78 @@ Function GetYAMLAsDictionary(fromYAML As String) As Dictionary
         Next entry
     ElseIf mainDictionary(typeIdentifier) = "Array" Then
         Dim i As Integer
+        Dim subArray() As Object
         For i = LBound(mainDictionary(selfIdentifier)) To UBound(mainDictionary(selfIdentifier))
             Debug.Print "=== PROCESSING ARRAY ENTRY ==="
             Debug.Print mainDictionary(selfIdentifier)(i)
-            Set mainDictionary(selfIdentifier)(i) = GetYAMLAsDictionary(CStr(mainDictionary(selfIdentifier)(i)))
+            'Set subDictionary = GetYAMLAsDictionary(mainDictionary(selfIdentifier)(i))
+            'Set mainDictionary(selfIdentifier)(i) = subDictionary
+            ReDim Preserve subArray(i)
+            Set subArray(i) = GetYAMLAsDictionary(CStr(mainDictionary(selfIdentifier)(i)))
         Next i
+        
+        mainDictionary(selfIdentifier) = subArray
     ElseIf mainDictionary(typeIdentifier) <> "String" Then
-        Call MsgBox(malformedTypeError, vbOKOnly, errIdentifier)
+        Debug.Print malformedTypeError ', vbOKOnly, errIdentifier)
     End If
     Set GetYAMLAsDictionary = mainDictionary
+End Function
+
+' YAML Cleaner Pseudocode
+' =====
+' function YAMLCleaner(Dictionary mainDictionary) {
+'   for each entry in mainDictionary {
+'     if entry(typeIdentifier) == "Dictionary" {
+'       for each secondOrderEntry in entry {
+'         YAMLCleaner(secondOrderEntry)
+'       }
+'     } else if entry(typeIdentifier) == "Array" {
+'       for each secondOrderEntry in entry(selfIdentifier) {
+'         YAMLCleaner(secondOrderEntry)
+'       }
+'     }
+'     if entry(typeIdentifier) != "Dictionary" {
+'       mainDictionary(entry) = mainDictionary(entry)(selfIdentifier)
+'     }
+'   }
+'   return mainDictionary;
+' }
+
+Function YAMLCleaner(mainDictionary As Dictionary) As Dictionary
+    Dim entry As Variant
+    If mainDictionary(typeIdentifier) = "Array" Then ' go through array and yamlclean it
+        Dim i As Integer
+        Debug.Print JsonConverter.ConvertToJson(mainDictionary)
+        For i = LBound(mainDictionary(selfIdentifier)) To UBound(mainDictionary(selfIdentifier))
+            
+            'If IsObject(mainDictionary(selfIdentifier)(i)) Then
+                'Set mainDictionary(selfIdentifier)(i) = YAMLCleaner(mainDictionary(selfIdentifier)(i))
+            'Else
+            '    Debug.Print "encountered non-object"
+            'End If
+        Next i
+    End If
+    If mainDictionary(typeIdentifier) = "Dictionary" Then 'iterate through dict and yamlclena it
+        For Each entry In mainDictionary
+            If entry <> typeIdentifier Then
+                Set mainDictionary(entry) = YAMLCleaner(mainDictionary(entry))
+            End If
+        Next entry
+    End If
+    
+    For Each entry In mainDictionary
+        If mainDictionary(typeIdentifier) = "Dictionary" And mainDictionary(entry)(typeIdentifier) <> "Dictionary" And entry <> typeIdentifier And entry <> selfIdentifier Then
+            Debug.Print "processing " & entry & " which is " & mainDictionary(entry)(typeIdentifier)
+            If IsObject(mainDictionary(entry)(selfIdentifier)) Then
+                Set mainDictionary(entry) = mainDictionary(entry)(selfIdentifier)
+            Else
+                mainDictionary(entry) = mainDictionary(entry)(selfIdentifier)
+            End If
+        End If
+    Next entry
+
+    ' destroy type identifier?
+    Set YAMLCleaner = mainDictionary
 End Function
 
 Function GetFileAsString(filePath As String) As String
@@ -236,21 +302,12 @@ Function GetFileAsString(filePath As String) As String
     Loop
 End Function
 
-Sub Init()
-    yamlPath = "\\Mac\iCloud\Development\cv\cv.yml"
-    
-    selfIdentifier = "___self___"
-    typeIdentifier = "___type___"
-    errIdentifier = "YAML Error in " & yamlPath
-    
-    malformedYAMLError = "Malformed YAML code at " & yamlPath & " on line "
-    malformedTypeError = "Malformed type error - this is a problem with the internal dictionary"
-End Sub
-
 Sub TryFunction()
-    Call Init
     Dim fileString As String: fileString = GetFileAsString("\\Mac\iCloud\Development\cv\cv.yml")
     Dim yamlLayer As Object
     Set yamlLayer = GetYAMLLayerAsDictionary(fileString)
     Dim yamlWholeDict As Object: Set yamlWholeDict = GetYAMLAsDictionary(fileString)
+    'Debug.Print JsonConverter.ConvertToJson(yamlWholeDict, 2, 2)
+    Dim yamlCleanDict As Object: Set yamlCleanDict = YAMLCleaner(yamlWholeDict)
+    Debug.Print JsonConverter.ConvertToJson(yamlCleanDict, 2, 2)
 End Sub

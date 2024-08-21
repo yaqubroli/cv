@@ -1,16 +1,31 @@
-Attribute VB_Name = "YAMLParser"
+VERSION 1.0 CLASS
+BEGIN
+  MultiUse = -1  'True
+END
+Attribute VB_Name = "YAML"
+Attribute VB_GlobalNameSpace = False
+Attribute VB_Creatable = False
+Attribute VB_PredeclaredId = False
+Attribute VB_Exposed = False
 Option Explicit
 
-Const yamlPath As String = "\\Mac\iCloud\Development\cv\cv.yml"
+' Const yamlPath As String = "\\Mac\iCloud\Development\cv\cv.yml"
 
-Const selfIdentifier As String = "___self___"
-Const typeIdentifier As String = "___type___"
-Const errIdentifier As String = "YAML Error in " & yamlPath
+' enums
 
-Const malformedTypeError As String = "Malformed YAML code at " & yamlPath & " on line "
-Const malformedYAMLError As String = "Malformed type error - this is a problem with the internal dictionary"
+Public yamlPath As String
+Public yamlSerialised As Dictionary
 
-Function RemoveEmptyStrings(arr() As String) As String()
+Private Const ID_SELF As String = "___self___"
+Private Const ID_TYPE As String = "___type___"
+
+Private Const MESSAGE_ERROR_GENERIC As String = "YAML Error in " & yamlPath
+Private Const MESSAGE_MALFORMED_TYPE As String = "Malformed YAML code at " & yamlPath & " on line "
+Private Const MESSAGE_MALFORMED_YAML As String = "Malformed type error - this is a problem with the internal dictionary"
+Private Const MESSAGE_GETPROP_NOT_STR As String = "Your module has tried to use getProp(), which is meant for type String, on a "
+Private Const MESSAGE_GETPROP_NOT_FOUND As String = "Property not found."
+
+Private Function RemoveEmptyStrings(arr() As String) As String()
     Dim tempArray() As String
     Dim i As Integer, j As Integer: j = 0
     ReDim tempArray(LBound(arr) To UBound(arr))
@@ -26,7 +41,7 @@ Function RemoveEmptyStrings(arr() As String) As String()
 End Function
 
 
-Function RegexMatch(inputString As String, pattern As String, Optional isGlobal As Boolean = True) As Boolean
+Private Function RegexMatch(inputString As String, pattern As String, Optional isGlobal As Boolean = True) As Boolean
     ' checks for regex match without instantiating 80 gazillion objects
     
     ' parameters
@@ -38,7 +53,7 @@ Function RegexMatch(inputString As String, pattern As String, Optional isGlobal 
     RegexMatch = Regex.Test(inputString)
 End Function
 
-Function RegexSplit(inputString As String, pattern As String, Optional onlyFirst As Boolean = False, Optional splitBefore As Boolean = False) As String()
+Private Function RegexSplit(inputString As String, pattern As String, Optional onlyFirst As Boolean = False, Optional splitBefore As Boolean = False) As String()
     ' splits array at any pattern that matches a regex
     
     ' parameters
@@ -85,7 +100,7 @@ Function RegexSplit(inputString As String, pattern As String, Optional onlyFirst
     RegexSplit = RemoveEmptyStrings(splitParts)
 End Function
 
-Function RegexSubstitute(inputString As String, pattern As String, Optional substitution As String = "")
+Private Function RegexSubstitute(inputString As String, pattern As String, Optional substitution As String = "")
     ' does what it says on the tin
     Dim Regex As Object: Set Regex = CreateObject("VBScript.RegExp")
     Regex.pattern = pattern
@@ -122,7 +137,7 @@ End Function
 ' }
 
 
-Function GetYAMLLayerAsDictionary(fromYAML As String) As Dictionary
+Private Function GetYAMLLayerAsDictionary(fromYAML As String) As Dictionary
     Dim mainDictionary As Dictionary: Set mainDictionary = New Dictionary
     ' create regex objects to test for dict, array, and string
     
@@ -198,7 +213,7 @@ End Function
 '     MsgBox("Internal YAML Error")
 '   }
 ' }
-Function GetYAMLAsDictionary(fromYAML As String) As Dictionary
+Private Function GetYAMLAsDictionary(fromYAML As String) As Dictionary
     Dim mainDictionary As Object: Set mainDictionary = GetYAMLLayerAsDictionary(fromYAML)
     Dim entry As Variant
     If mainDictionary(typeIdentifier) = "Dictionary" Then
@@ -248,44 +263,44 @@ End Function
 '   return mainDictionary;
 ' }
 
-Function YAMLCleaner(mainDictionary As Dictionary) As Dictionary
-    Dim entry As Variant
-    If mainDictionary(typeIdentifier) = "Array" Then ' go through array and yamlclean it
-        Dim i As Integer
-        Debug.Print JsonConverter.ConvertToJson(mainDictionary)
-        For i = LBound(mainDictionary(selfIdentifier)) To UBound(mainDictionary(selfIdentifier))
-            
-            'If IsObject(mainDictionary(selfIdentifier)(i)) Then
-                'Set mainDictionary(selfIdentifier)(i) = YAMLCleaner(mainDictionary(selfIdentifier)(i))
-            'Else
-            '    Debug.Print "encountered non-object"
-            'End If
-        Next i
-    End If
-    If mainDictionary(typeIdentifier) = "Dictionary" Then 'iterate through dict and yamlclena it
-        For Each entry In mainDictionary
-            If entry <> typeIdentifier Then
-                Set mainDictionary(entry) = YAMLCleaner(mainDictionary(entry))
-            End If
-        Next entry
-    End If
-    
-    For Each entry In mainDictionary
-        If mainDictionary(typeIdentifier) = "Dictionary" And mainDictionary(entry)(typeIdentifier) <> "Dictionary" And entry <> typeIdentifier And entry <> selfIdentifier Then
-            Debug.Print "processing " & entry & " which is " & mainDictionary(entry)(typeIdentifier)
-            If IsObject(mainDictionary(entry)(selfIdentifier)) Then
-                Set mainDictionary(entry) = mainDictionary(entry)(selfIdentifier)
-            Else
-                mainDictionary(entry) = mainDictionary(entry)(selfIdentifier)
-            End If
-        End If
-    Next entry
+'Function YAMLCleaner(mainDictionary As Dictionary) As Dictionary
+'    Dim entry As Variant
+'    If mainDictionary(typeIdentifier) = "Array" Then ' go through array and yamlclean it
+'        Dim i As Integer
+'        Debug.Print JsonConverter.ConvertToJson(mainDictionary)
+'        For i = LBound(mainDictionary(selfIdentifier)) To UBound(mainDictionary(selfIdentifier))
+'
+'            'If IsObject(mainDictionary(selfIdentifier)(i)) Then
+'                'Set mainDictionary(selfIdentifier)(i) = YAMLCleaner(mainDictionary(selfIdentifier)(i))
+'            'Else
+'            '    Debug.Print "encountered non-object"
+'            'End If
+'        Next i
+'    End If
+'    If mainDictionary(typeIdentifier) = "Dictionary" Then 'iterate through dict and yamlclena it
+'        For Each entry In mainDictionary
+'            If entry <> typeIdentifier Then
+'                Set mainDictionary(entry) = YAMLCleaner(mainDictionary(entry))
+'            End If
+'        Next entry
+'    End If
+'
+'    For Each entry In mainDictionary
+'        If mainDictionary(typeIdentifier) = "Dictionary" And mainDictionary(entry)(typeIdentifier) <> "Dictionary" And entry <> typeIdentifier And entry <> selfIdentifier Then
+'            Debug.Print "processing " & entry & " which is " & mainDictionary(entry)(typeIdentifier)
+'            If IsObject(mainDictionary(entry)(selfIdentifier)) Then
+'                Set mainDictionary(entry) = mainDictionary(entry)(selfIdentifier)
+'            Else
+'                mainDictionary(entry) = mainDictionary(entry)(selfIdentifier)
+'            End If
+'        End If
+'    Next entry
+'
+'    ' destroy type identifier?
+'    Set YAMLCleaner = mainDictionary
+'End Function
 
-    ' destroy type identifier?
-    Set YAMLCleaner = mainDictionary
-End Function
-
-Function GetFileAsString(filePath As String) As String
+Private Function GetFileAsString(filePath As String) As String
     ' Dim fileContent As String
     Dim line As String
     Dim fileNumber As Integer
@@ -302,12 +317,37 @@ Function GetFileAsString(filePath As String) As String
     Loop
 End Function
 
-Sub TryFunction()
-    Dim fileString As String: fileString = GetFileAsString("\\Mac\iCloud\Development\cv\cv.yml")
-    Dim yamlLayer As Object
-    Set yamlLayer = GetYAMLLayerAsDictionary(fileString)
-    Dim yamlWholeDict As Object: Set yamlWholeDict = GetYAMLAsDictionary(fileString)
-    'Debug.Print JsonConverter.ConvertToJson(yamlWholeDict, 2, 2)
-    Dim yamlCleanDict As Object: Set yamlCleanDict = YAMLCleaner(yamlWholeDict)
-    Debug.Print JsonConverter.ConvertToJson(yamlCleanDict, 2, 2)
-End Sub
+Public Property Let path(thePath As String)
+    yamlPath = thePath
+End Property
+
+Public Property Get path() As String
+    path = yamlPath
+End Property
+
+Public Property Get props() As Dictionary
+    Set props = GetYAMLAsDictionary(GetFileAsString(yamlPath))
+End Property
+
+' YAML Indexer Pseudocode [implement later]
+' =====
+' function index(string theIndex) {
+'   Variant[] mainArray = theIndex.split(".");
+'   Dictionary mainDictionary = yamlProps;
+'   for each entry in mainArray {
+'     if entry is {
+'
+'     ....
+
+
+'Public Sub TryFunction()
+'    Dim fileString As String: fileString = GetFileAsString("\\Mac\iCloud\Development\cv\cv.yml")
+'    Dim yamlLayer As Object
+'    Set yamlLayer = GetYAMLLayerAsDictionary(fileString)
+'    Dim yamlWholeDict As Object: Set yamlWholeDict = GetYAMLAsDictionary(fileString)
+'    'Debug.Print JsonConverter.ConvertToJson(yamlWholeDict, 2, 2)
+'    Dim yamlCleanDict As Object: Set yamlCleanDict = YAMLCleaner(yamlWholeDict)
+'    Debug.Print JsonConverter.ConvertToJson(yamlCleanDict, 2, 2)
+'End Sub
+
+

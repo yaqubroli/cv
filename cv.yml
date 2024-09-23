@@ -9,13 +9,13 @@ phones:
     phone: "+1 604 880 4825"
 
 cv:
-  - title: Education
+  - title: "Education"
     entries:
       - title: "Westside School"
         location: "Vancouver, Canada"
         date: "2019---2021"
         bullets:
-          - "/A\*A\*A\*A\*A-equivalent marks, per KCL's conversion scale."
+          - "A*A*A*A*A-equivalent marks, per KCL's conversion scale."
       - title: "Trinity Western University"
         role: "B.A. in Political Studies"
         location: "Langley, Canada"
@@ -28,7 +28,7 @@ cv:
         date: "2022---2025"
         bullets:
           - "Standing 2:2 Honours, with a focus on symbolic logic and analytic metaphysics."
-  - title: Work Experience
+  - title: "Work Experience"
     entries:
       - title: "Kova Engineering, Ltd."
         role: "Technical Analyst Intern"
@@ -54,11 +54,9 @@ cv:
 
 projects:
   - title: "Book Tracker"
-    bullets:
-      - "Reverse-engineered the SQLite schemas of bibliographic and note-taking software, and wrote a quick Node.js tool to generate progress reports and publish notes to my personal website."
+    description: "Reverse-engineered the SQLite schemas of bibliographic and note-taking software, and wrote a quick Node.js tool to generate progress reports and publish notes to my personal website."
   - title: "Homelab"
-    bullets:
-      - "Ran a decomissioned rackmount server at home, deploying KVM on Debian, and later, Xen."
+    description: "Ran a decommissioned rackmount server at home, deploying KVM on Debian, and later, Xen."
 skills:
   - "Certifications: CompTIA Linux+, IBM Data Analyst Certificate (Excel, Cognos, and R), IBM Data Science Certificate (Python)."
   - "Languages: Mandarin (working proficiency), German (basic)."
@@ -66,5 +64,5 @@ skills:
   - "Interests: Linguistics, social and economic history, corporate finance."
 
 footer:
+  - "Authorised to work full-time in the UK, without sponsorship."
   - "This {{DOCTYPE}} was generated from YAML source using {{LANG}}. For more information, see jacob.hcol.uk/cv."
-  - "Authorised to work full-time in the UK, without sponsorship, via an Ancestry Visa."

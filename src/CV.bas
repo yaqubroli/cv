@@ -100,12 +100,12 @@ Function DrawCompoundBulletedList(theTitles() As String, theDescriptions() As St
             .Bold = True
             .SmallCaps = True
         End With
-        Selection.TypeText Text:="bar" ' theTitles(i)
+        Selection.TypeText Text:=theTitles(i)
         With Selection.Font
             .Bold = False
             .SmallCaps = False
         End With
-        Selection.TypeText Text:=" - baz" ' " " & ChrW(8212) & " " & theDescriptions(i)
+        Selection.TypeText Text:=" " & ChrW(8212) & " " & theDescriptions(i)
         Selection.TypeParagraph
     Next i
     
@@ -188,7 +188,7 @@ Attribute DrawCV.VB_ProcData.VB_Invoke_Func = "Normal.NewMacros.Macro1"
     For l = LBound(cvProps("projects")(ID_SELF)) To UBound(cvProps("projects")(ID_SELF))
         ' Debug.Print JsonConverter.ConvertToJson(cvProps("projects")(ID_SELF)(l), 2)
         titles(l) = CStr(cvProps("projects")(ID_SELF)(l)("title")(ID_SELF))
-        descriptions(l) = CStr(cvProps("projects")(ID_SELF)(l)("title")(ID_SELF))
+        descriptions(l) = CStr(cvProps("projects")(ID_SELF)(l)("description")(ID_SELF))
     Next l
     
     DrawCompoundBulletedList titles, descriptions

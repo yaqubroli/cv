@@ -1,18 +1,7 @@
 * YAML CV Generator
 
-** Features to implement
-[*] YAML parsing function
-[*] YAML class which can be instantiated
-[*] docx writing functionality
-[ ] proper formatting
-*** Human-readable CV
-[ ] phone/web/mail/etc icons
-[ ] right-justified years and locations
-[ ] footer
-*** Machine-readable CV
-[ ] everything
-*** Build system
-[ ] proper python scripts for extracting VBAProject.bin (olevba)
-[ ] proper python scripts for re-injecting VBAProject.bin (maybe not possible)
-*** Other things
-[ ] LaTeX CV generator from the same YAML
+All basic features are now implemented; a more detailed readme is forthcoming.
+
+ To demo yourself, use the VBASync tool to inject the code into a new document, or access cv.docm.
+
+Change the variable YAML_PATH in *StringTable.bas* to the location of your YAML file.
